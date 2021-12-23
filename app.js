@@ -1,11 +1,13 @@
 
 //jshint esversion:6
-require('dotenv').config()
+require('dotenv').config()//env ko use karne k liye y hota h y
+//env Environment variablewhich is used for securing data By hiding overAPI key orimportant keys
 const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
 const mongooseEncryption = require('mongoose-encryption');
+// mongoose encryption is used to encrypt our data by creating a secret key which is used for  encryption
 const app =express()
 app.use(express.static(`public`));
 app.set(`view engine`,`ejs`);
@@ -17,7 +19,7 @@ const userSchema =new mongoose.Schema({
 });
 // var secret = `Thisismyownsecret`;
 userSchema.plugin(mongooseEncryption, { secret: process.env.SECRET ,encryptedFields: ['password']})
-
+//Aise hi use hota h y first pass the secret key which is stored in .env file and then pass the encryption feilds
 
 const User =new mongoose.model(`User`,userSchema)
 
