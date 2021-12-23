@@ -94,6 +94,24 @@ app.route(`/register`)
 
 
 
+app.route(`/logout`)
+.get(function(req,res){
+  res.redirect(`/`)
+});
+
+
+
+
+
+
+
+app.route(`/submit`)
+.get(function(req,res){
+  res.render(`submit`)
+});
+
+
+
 
 
 
