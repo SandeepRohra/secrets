@@ -1,13 +1,13 @@
 
 //jshint esversion:6
 require('dotenv').config()//env ko use karne k liye y hota h y
-//env Environment variablewhich is used for securing data By hiding overAPI key orimportant keys
 const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
-const mongooseEncryption = require('mongoose-encryption');
-// mongoose encryption is used to encrypt our data by creating a secret key which is used for  encryption
+const md5 = require('md5');// md 5 is used for hashing password and is verry simpe
+//where we want to hash a feild we use md5(and here what we want to hash)
+
 const app =express()
 app.use(express.static(`public`));
 app.set(`view engine`,`ejs`);
@@ -17,9 +17,7 @@ const userSchema =new mongoose.Schema({
   email:String,
   password:String
 });
-// var secret = `Thisismyownsecret`;
-userSchema.plugin(mongooseEncryption, { secret: process.env.SECRET ,encryptedFields: ['password']})
-//Aise hi use hota h y first pass the secret key which is stored in .env file and then pass the encryption feilds
+
 
 const User =new mongoose.model(`User`,userSchema)
 
@@ -50,8 +48,9 @@ app.route(`/login`)
 })
 .post(function(req,res){
 const email = req.body.username
-const password =req.body.password
-
+const password= md5(req.body.password)
+//Yaha p dono jaga hash use hua h kyuki y jaruri h every same password has same hashes
+// to matlab register and login dono routes m use hiua h md5()
   User.findOne({email:email},function(err,foundUser){
     if(err){
       console.log(err);
@@ -83,7 +82,7 @@ app.route(`/register`)
 .post(function(req,res){
   const newUser=new User({
     email:req.body.username,
-    password:req.body.password
+    password:md5(req.body.password)
   });
   newUser.save(function(err){
   if(err){
