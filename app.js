@@ -5,8 +5,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
-const md5 = require('md5');// md 5 is used for hashing password and is verry simpe
-//where we want to hash a feild we use md5(and here what we want to hash)
+const bcrypt = require('bcrypt');
+const saltRounds= 10;
 
 const app =express()
 app.use(express.static(`public`));
@@ -48,23 +48,29 @@ app.route(`/login`)
 })
 .post(function(req,res){
 const email = req.body.username
-const password= md5(req.body.password)
-//Yaha p dono jaga hash use hua h kyuki y jaruri h every same password has same hashes
-// to matlab register and login dono routes m use hiua h md5()
+const password= req.body.password
+
   User.findOne({email:email},function(err,foundUser){
     if(err){
       console.log(err);
     }
   else{
-    if (foundUser && foundUser.password=== password){
+    if (foundUser){
+      bcrypt.compare(password, foundUser.password, function(err, result) {
+    // result == true
+
+    if(result ===true){
       console.log(foundUser);
         res.render(`secrets`)
-      }
-      else{
+    }  else{
           console.log(email,password);
         res.send(`Invalid email or password`)
 
       }
+});
+
+      }
+
   }
   })
 });
@@ -80,18 +86,23 @@ app.route(`/register`)
   res.render(`register`)
 })
 .post(function(req,res){
-  const newUser=new User({
-    email:req.body.username,
-    password:md5(req.body.password)
+  bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+      // Store hash in your password DB.
+      const newUser=new User({
+        email:req.body.username,
+        password:hash
+      });
+      newUser.save(function(err){
+      if(err){
+        console.log(err);
+      }else{
+        res.render(`secrets`)
+      }
+      })
+    });
   });
-  newUser.save(function(err){
-  if(err){
-    console.log(err);
-  }else{
-    res.render(`secrets`)
-  }
-  })
-});
+
+
 
 
 
