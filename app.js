@@ -1,22 +1,12 @@
-
 //jshint esversion:6
 require('dotenv').config()//env ko use karne k liye y hota h y
 const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
-<<<<<<< HEAD
-const bcrypt = require('bcrypt');
-const saltRounds= 10;
-
-||||||| af7c470
-const mongooseEncryption = require('mongoose-encryption');
-// mongoose encryption is used to encrypt our data by creating a secret key which is used for  encryption
-=======
-const md5 = require('md5');// md 5 is used for hashing password and is verry simpe
-//where we want to hash a feild we use md5(and here what we want to hash)
-
->>>>>>> 3139db669f88d1a65eb740ed9f97cf2d7724b085
+const bcrypt = require('bcrypt');// to use bcrypt
+const saltRounds =10;//we need number of salts to secure our password
+//these are salt rounds used isse apan kitte salts add karna h vo likhte h
 const app =express()
 app.use(express.static(`public`));
 app.set(`view engine`,`ejs`);
@@ -56,41 +46,36 @@ app.route(`/login`)
   res.render(`login`)
 })
 .post(function(req,res){
-const email = req.body.username
-<<<<<<< HEAD
-const password= req.body.password
+    const email = req.body.username
+        const password= req.body.password
 
-||||||| af7c470
-const password =req.body.password
 
-=======
-const password= md5(req.body.password)
-//Yaha p dono jaga hash use hua h kyuki y jaruri h every same password has same hashes
-// to matlab register and login dono routes m use hiua h md5()
->>>>>>> 3139db669f88d1a65eb740ed9f97cf2d7724b085
-  User.findOne({email:email},function(err,foundUser){
-    if(err){
-      console.log(err);
-    }
-  else{
-    if (foundUser){
-      bcrypt.compare(password, foundUser.password, function(err, result) {
-    // result == true
 
-    if(result ===true){
-      console.log(foundUser);
-        res.render(`secrets`)
-    }  else{
-          console.log(email,password);
-        res.send(`Invalid email or password`)
+
+      User.findOne({email:email},function(err,foundUser){
+        if(err){
+          console.log(err);
+        }
+      else{
+        if (foundUser){// yaha p apan vo hash compare karte h using bcrypt.compare
+          bcrypt.compare(password,foundUser.password, function(err, result) {
+            // result == true
+            if(result === true){//agaar results true hota ha to render karte h page
+              console.log(foundUser);
+                res.render(`secrets`)
+              }
+              else{
+                  console.log(email,password);
+                res.send(`Invalid email or password`)
+
+              }
+            })
+          }
 
       }
-});
+      })
 
-      }
 
-  }
-  })
 });
 
 
@@ -104,32 +89,22 @@ app.route(`/register`)
   res.render(`register`)
 })
 .post(function(req,res){
-<<<<<<< HEAD
+//register route m apan bcrypt use karte h to hash and saltyfy password
   bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
-      // Store hash in your password DB.
-      const newUser=new User({
-        email:req.body.username,
-        password:hash
-      });
-      newUser.save(function(err){
-      if(err){
-        console.log(err);
-      }else{
-        res.render(`secrets`)
-      }
-      })
+    // Store hash in your password DB.
+    const newUser=new User({
+      email:req.body.username,
+      password:hash
     });
-||||||| af7c470
-  const newUser=new User({
-    email:req.body.username,
-    password:req.body.password
-=======
-  const newUser=new User({
-    email:req.body.username,
-    password:md5(req.body.password)
->>>>>>> 3139db669f88d1a65eb740ed9f97cf2d7724b085
+    newUser.save(function(err){
+    if(err){
+      console.log(err);
+    }else{
+      res.render(`secrets`)
+    }
+    })
   });
-
+});
 
 
 
@@ -162,32 +137,7 @@ app.route(`/submit`)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-app.listen(3000,function(){
-  console.log(`Server started at port 3000`);
+//5)Then we listen it to a port using
+app.listen(3000,function(req,res){
+console.log(`Server is running at port 3000`)
 })
